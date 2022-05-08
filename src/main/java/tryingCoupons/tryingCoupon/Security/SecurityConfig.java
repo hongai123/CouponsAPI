@@ -1,7 +1,9 @@
 package tryingCoupons.tryingCoupon.Security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -11,7 +13,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import tryingCoupons.tryingCoupon.beans.Roles;
+
+import java.util.Arrays;
+import java.util.Collections;
+
 
 @Configuration
 @EnableWebSecurity
@@ -43,7 +52,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                .cors().and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
                 .and()
                 .authorizeRequests()
                 .antMatchers("/","index","/css","/js","media","img","/login/**")
@@ -59,7 +70,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/**").hasRole(Roles.ADMIN.name())
                 .antMatchers("/company/**").hasRole(Roles.COMPANY.name())
                 .antMatchers("/customer/**").hasRole(Roles.CUSTOMER.name())
-                .anyRequest().authenticated()
+                .antMatchers("/token/**").permitAll()
+                .antMatchers("/guest/**").permitAll()
+                .anyRequest().permitAll()
                 .and()
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin()
@@ -86,8 +99,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/swagger-ui.html",
                 "/webjars/**")
                 .antMatchers("/token/**")
-                .antMatchers("/guest/**");
+                .antMatchers("/guest/**")
+                .and()
+        
+//                .antMatchers("/admin/**")
+//                .antMatchers("/company/**")
+//                .antMatchers("/customer/**")
+
+        ;
+
     }
+
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
+        configuration.setAllowedOrigins(Collections.singletonList("*"));
+        configuration.addAllowedMethod(HttpMethod.TRACE);
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "OPTIONS"));
+        configuration.addExposedHeader("Authorization");
+        configuration.addAllowedHeader("*");
+
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+
 
 
 

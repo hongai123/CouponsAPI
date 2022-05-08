@@ -176,7 +176,7 @@ public class UploadSomeData implements CommandLineRunner {
 
             adminServicesMPL.login("admin@admin.com", "admin");
 
-        company1.setEmail("justin bieber");
+        company1.setEmail("justinbieber");
         company1.setPassword("DrewHouse");
         adminServicesMPL.updateCompany(company1,jwtTokenAdmin);
 

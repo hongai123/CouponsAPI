@@ -50,6 +50,7 @@ public class UploadSomeData implements CommandLineRunner {
                 .build();
         ResponseEntity<String> response1 = restTemplate.postForEntity(login,userProp,String.class,params);
         String jwtTokenAdmin = response1.getHeaders().getFirst("Authorization");
+        System.out.println(jwtTokenAdmin);
 
 
 

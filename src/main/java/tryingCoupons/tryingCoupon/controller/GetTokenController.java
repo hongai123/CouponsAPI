@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/token")
-@CrossOrigin
+@CrossOrigin(exposedHeaders = "Authorization")
 @RequiredArgsConstructor
 /**
  * login/token/logout controller

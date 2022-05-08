@@ -65,14 +65,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/configuration/security",
                         "/swagger-ui.html",
                         "/webjars/**").permitAll()
-                .antMatchers("/token/getToken").permitAll()
                 .antMatchers("/login/**").permitAll()
                 .antMatchers("/admin/**").hasRole(Roles.ADMIN.name())
                 .antMatchers("/company/**").hasRole(Roles.COMPANY.name())
-                .antMatchers("/customer/**").hasRole(Roles.CUSTOMER.name())
+                .antMatchers("/customer/**").hasRole(Roles.CUSTOMER.name()).and()
+                .authorizeRequests()
                 .antMatchers("/token/**").permitAll()
+                .and()
+                .authorizeRequests()
                 .antMatchers("/guest/**").permitAll()
-                .anyRequest().permitAll()
                 .and()
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin()
@@ -100,8 +101,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/webjars/**")
                 .antMatchers("/token/**")
                 .antMatchers("/guest/**")
-                .and()
-        
+//                .and()
+
 //                .antMatchers("/admin/**")
 //                .antMatchers("/company/**")
 //                .antMatchers("/customer/**")
@@ -120,6 +121,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "OPTIONS"));
         configuration.addExposedHeader("Authorization");
         configuration.addAllowedHeader("*");
+        //allow to get credentials in cors
+        configuration.addAllowedOriginPattern("*");
+        //allow to get from any ip/domain
+        configuration.addAllowedOrigin("*");
+        //allow to get any header
+        configuration.addAllowedHeader("*");
+        //tell which VERB is allowed
+        configuration.addAllowedMethod("*");
+        configuration.addExposedHeader("Authorization");
+        configuration.addAllowedMethod("POST");
+        configuration.addAllowedMethod("PUT");
+        configuration.addAllowedMethod("DELETE");
 
         source.registerCorsConfiguration("/**", configuration);
         return source;

@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*" , methods = {RequestMethod.POST,RequestMethod.PUT,RequestMethod.DELETE,RequestMethod.GET})
 
 /**
  * The Controller of admin.

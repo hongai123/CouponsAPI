@@ -82,19 +82,19 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         filterChain.doFilter(request,response);
                     }catch (Exception err){
 
-                        if(err.getMessage().startsWith("The Token has expired on")){
-                            String newToken;
-                            String url = "http://localhost:8080/token/getToken";
-                            //System.out.println("ok im here");
-                            ResponseEntity<String> responseEntity = restTemplate.getForEntity(url,String.class);
-                            newToken=responseEntity.getHeaders().getFirst("token");
-                            response.setHeader("new-token",newToken);
-                            Map<String, String> error = new HashMap<>();
-                            response.setStatus(FORBIDDEN.value());
-                            error.put("error message",err.getMessage());
-                            response.setContentType(APPLICATION_JSON_VALUE);
-                            new ObjectMapper().writeValue(response.getOutputStream(),error);
-                        }else {
+//                        if(err.getMessage().startsWith("The Token has expired on")){
+//                            String newToken;
+//                            String url = "http://localhost:8080/token/getToken";
+//                            //System.out.println("ok im here");
+//                            ResponseEntity<String> responseEntity = restTemplate.getForEntity(url,String.class);
+//                            newToken=responseEntity.getHeaders().getFirst("token");
+//                            response.setHeader("new-token",newToken);
+//                            Map<String, String> error = new HashMap<>();
+//                            response.setStatus(FORBIDDEN.value());
+//                            error.put("error message",err.getMessage());
+//                            response.setContentType(APPLICATION_JSON_VALUE);
+//                            new ObjectMapper().writeValue(response.getOutputStream(),error);
+//                        }else {
                             response.setHeader("error", err.getMessage());
                             response.setStatus(FORBIDDEN.value());
                             //response.sendError(FORBIDDEN.value());
@@ -102,7 +102,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                             error.put("error message", err.getMessage());
                             response.setContentType(APPLICATION_JSON_VALUE);
                             new ObjectMapper().writeValue(response.getOutputStream(), error);
-                        }
+
                     }
                 }else{
                     response.setHeader("error", " please log in");

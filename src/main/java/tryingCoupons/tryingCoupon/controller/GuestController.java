@@ -11,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/guest")
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 /**
  * Controller for guests.
  */

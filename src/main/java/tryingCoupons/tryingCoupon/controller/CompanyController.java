@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/company")
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CompanyController {
     private final CompanyServiceMPL companyServiceMPL;
 //

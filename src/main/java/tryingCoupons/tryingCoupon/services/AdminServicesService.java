@@ -81,6 +81,9 @@ public class AdminServicesService extends ClientService implements AdminService 
     @Override
     public void updateCompany(Company company, String token) throws CompanyException {
         if(COMPANY_REPO.existsById(company.getId())){
+            if(COMPANY_REPO.isCompanyExistsByEmail(company.getEmail())){
+                throw new CompanyException("Email has been taken");
+            }
             COMPANY_REPO.updateCompany(company.getEmail(), company.getPassword(), company.getId());
             System.out.println("successfully updated company id: " + company.getId());
         }

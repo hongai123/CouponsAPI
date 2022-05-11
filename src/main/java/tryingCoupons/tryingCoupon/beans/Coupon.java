@@ -62,7 +62,7 @@ public class Coupon {
     private int amount;
     @Column(name = "price",nullable = false,length = 40)
     private double price;
-    @Column(name = "image",nullable = false,length = 40)
+    @Column(name = "image",nullable = false)
     private String image;
     @Column(name = "category_by_id")
     private int category_id_bynum;

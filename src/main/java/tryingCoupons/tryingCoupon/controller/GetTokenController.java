@@ -166,7 +166,18 @@ public class GetTokenController {
 
         if(user.getRole().name().equals("CUSTOMER"))
             if(customerServiceMPL.login(user.getUsername(), user.getPassword())){
-            return null;
+                Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
+                List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + Roles.CUSTOMER.name()));
+                User userDetails = new User(user.getUsername(), user.getPassword(), authorities);
+                String token = JWT.create().withSubject(userDetails.getUsername())
+                        .withClaim("id", customerServiceMPL.CustomerId(user.getUsername()))
+                        .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 10000))
+                        .withClaim("authorities", userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList())).sign(algorithm);
+                responseHeader.set("Authorization", "Bearer " + token);
+                return ResponseEntity.accepted()
+                        .headers(responseHeader)
+                        .body("your token is in the headers!");
         }
 
 

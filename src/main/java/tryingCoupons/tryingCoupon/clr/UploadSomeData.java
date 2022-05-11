@@ -59,12 +59,12 @@ public class UploadSomeData implements CommandLineRunner {
         Company company1 = Company.builder()
                 .password("12345")
                 .email("huyn3211")
-                .name("asda")
+                .name("CouponRus")
                 .build();
         Company company2 = Company.builder()
                 .password("12345")
                 .email("justin122")
-                .name("damSon")
+                .name("CouponsAreThey")
                 .build();
 
 
@@ -94,37 +94,37 @@ public class UploadSomeData implements CommandLineRunner {
         companyServiceMPL.login("huyn3211","12345");
 
         Coupon coupon1 = Coupon.builder()
-                .title("helpme up")
-                .amount(1009)
+                .title("Wheels")
+                .amount(230)
                 .company_id_sql(companyRepo.findById(1).get())
                 .category_id_bynum(2)
-                .image("sdfsdfsdf")
-                .price(2000)
-                .description("hey ya")
+                .image("https://149410163.v2.pressablecdn.com/wp-content/uploads/2020/10/Supreme-Power-Wheels-BBS-RS-Gold-Diamond-Cut.png")
+                .price(1000)
+                .description("BBS best wheels that you can find")
                 .end_date(Date.valueOf(LocalDate.now().plusDays(1)))
                 .start_date(Date.valueOf(LocalDate.now().minusDays(30)))
                 .build();
         Coupon coupon2 = Coupon.builder()
-                .title("dam up")
-                .amount(1007)
-                .image("sdfdfsdf")
+                .title("Toyota Supra")
+                .amount(5)
+                .image("https://aaajapan.com/images/Toyota%20Supra%20V12/toyota-supra-v12-top-secret-4.jpg")
                 .company_id_sql(companyRepo.findById(1).get())
                 .category_id_bynum(4)
                 .end_date(Date.valueOf(LocalDate.now().plusDays(3)))
                 .start_date(Date.valueOf(LocalDate.now()))
-                .price(20090)
-                .description("heykmya")
+                .price(23000)
+                .description("get 20% discount on this car")
                 .build();
         Coupon coupon3 = Coupon.builder()
-                .title("shut the hell up")
-                .amount(1800)
-                .image("sdfsdfsdf")
+                .title("Honda CBR1000")
+                .amount(3)
+                .image("https://honda.org.il/wp-content/uploads/2019/06/83526_17YM_CBR1000RR_Fireblade.jpg")
                 .category_id_bynum(2)
                 .company_id_sql(companyRepo.findById(1).get())
                 .price(25000)
                 .end_date(Date.valueOf(LocalDate.now().plusDays(1)))
                 .start_date(Date.valueOf(LocalDate.now()))
-                .description("hey nun ya")
+                .description("GET YOUR BIKE ON DISCOUNT TODAY!")
                 .build();
         companyServiceMPL.addCoupon(coupon1,jwtTokenCompany);
         companyServiceMPL.addCoupon(coupon2,jwtTokenCompany);
@@ -246,14 +246,14 @@ public class UploadSomeData implements CommandLineRunner {
 
 
         Coupon coupon5 = Coupon.builder()
-                .title("help me up")
-                .amount(1009)
-                .price(2000)
+                .title("mazdaRX7")
+                .amount(3)
+                .price(200000)
                 .category_id_bynum(1)
-                .description("hey ya")
+                .description("beautiful rx7")
                 .end_date(Date.valueOf(LocalDate.of(2022,12,12)))
                 .start_date(Date.valueOf(LocalDate.now()))
-                .image("sdfsfdkka")
+                .image("https://64.media.tumblr.com/703d6d275e9b153acec1204a328ffd50/tumblr_ponivzj7081vejkn0o1_1280.jpg")
                 .build();
 
       try{
@@ -286,14 +286,25 @@ public class UploadSomeData implements CommandLineRunner {
 
         System.out.println(companyServiceMPL.companyDetails(jwtTokenCompany));
 
+        Map<String,String> params3 = new HashMap<>();
+        params3.put("roles",Roles.CUSTOMER.name());
+        String login3 = "http://localhost:8080/token/log/{roles}";
+        UserProp userProp3 = UserProp.builder()
+                .username("just kill me already")
+                .password("justKillMeAlready")
+                .role(Roles.CUSTOMER)
+                .build();
+        ResponseEntity<String> response3 = restTemplate.postForEntity(login3,userProp3,String.class,params3);
+        String customerToken = response3.getHeaders().getFirst("Authorization");
+
         System.out.println(customerServiceMPL.login("just kill me already","justKillMeAlready"));
 
-        customerServiceMPL.purchaseCoupons(1);
+        customerServiceMPL.purchaseCoupons(1,customerToken);
 
-        System.out.println(customerServiceMPL.getAllCustomerCoupon());
+        System.out.println(customerServiceMPL.getAllCustomerCoupon(customerToken));
        // System.out.println(customerServiceMPL.getCustomerCouponByCategory(2));
-        System.out.println(customerServiceMPL.getCustomerCouponByMaxPriced(100000));
-        System.out.println(customerServiceMPL.getCustomerDetails());
+        System.out.println(customerServiceMPL.getCustomerCouponByMaxPriced(100000,customerToken));
+        System.out.println(customerServiceMPL.getCustomerDetails(customerToken));
 
 
 

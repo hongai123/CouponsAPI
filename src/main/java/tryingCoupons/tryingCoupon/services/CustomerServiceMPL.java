@@ -1,26 +1,19 @@
 package tryingCoupons.tryingCoupon.services;
 
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.Getter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import tryingCoupons.tryingCoupon.beans.Coupon;
 import tryingCoupons.tryingCoupon.beans.Customer;
-import tryingCoupons.tryingCoupon.beans.Roles;
 import tryingCoupons.tryingCoupon.exceptions.*;
 import tryingCoupons.tryingCoupon.repositories.CompanyRepo;
 import tryingCoupons.tryingCoupon.repositories.CouponRepo;
 import tryingCoupons.tryingCoupon.repositories.CustomerRepo;
-
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -29,7 +22,6 @@ public class CustomerServiceMPL extends ClientService implements CustomerService
     private int customerId;
     private Customer thisCustomer;
     private boolean isLogged = false;
-    private String token;
 
     public CustomerServiceMPL(CompanyRepo COMPANY_REPO, CustomerRepo CUSTOMER_REPO, CouponRepo COUPON_REPO) {
         super(COMPANY_REPO, CUSTOMER_REPO, COUPON_REPO);
@@ -65,7 +57,9 @@ public class CustomerServiceMPL extends ClientService implements CustomerService
      * @throws CustomerCouponException - Will be thrown if customer already own this coupon.
      */
     @Override
-    public void purchaseCoupons(int couponId) throws CustomerCouponException, CouponException, CouponOutOfAmountException, CouponExpiredException {
+    public void purchaseCoupons(int couponId, String token) throws CustomerCouponException, CouponException, CouponOutOfAmountException, CouponExpiredException {
+        thisCustomer = setId(token);
+        customerId = thisCustomer.getId();
         Coupon couponToPurchase;
         if(COUPON_REPO.existsById(couponId)){
             couponToPurchase = COUPON_REPO.findById(couponId).get();
@@ -98,7 +92,9 @@ public class CustomerServiceMPL extends ClientService implements CustomerService
      * @throws CouponException - Will be thrown if there are no coupons.
      */
     @Override
-    public List<Coupon> getAllCustomerCoupon() throws CouponException {
+    public List<Coupon> getAllCustomerCoupon(String token) throws CouponException {
+        thisCustomer = setId(token);
+        customerId = thisCustomer.getId();
         List<Coupon> customerCoupons = COUPON_REPO.findCouponsBelongToCustomer(customerId);
         if(customerCoupons.isEmpty()){
             throw new CouponException("coupons are not exists for this customer");
@@ -114,7 +110,9 @@ public class CustomerServiceMPL extends ClientService implements CustomerService
      * @throws CouponException - Will be thrown if there are no such coupons.
      */
     @Override
-    public List<Coupon> getCustomerCouponByCategory(int categoryId) throws CouponException {
+    public List<Coupon> getCustomerCouponByCategory(int categoryId, String token) throws CouponException {
+        thisCustomer = setId(token);
+        customerId = thisCustomer.getId();
         if(COUPON_REPO.couponsByCategoryAndCustomer(customerId,categoryId).isEmpty()){
             throw new CouponException("coupons are not exists for this customer");
         }
@@ -127,7 +125,9 @@ public class CustomerServiceMPL extends ClientService implements CustomerService
      * @throws CouponException -  Will be thrown if there are no coupons with this max price.
      */
     @Override
-    public List<Coupon> getCustomerCouponByMaxPriced(int maxPrice) throws CouponException {
+    public List<Coupon> getCustomerCouponByMaxPriced(int maxPrice, String token) throws CouponException {
+        thisCustomer = setId(token);
+        customerId = thisCustomer.getId();
         if(COUPON_REPO.customerCouponsMaxPrice(customerId,maxPrice).isEmpty()){
             throw new CouponException("coupons are not exists for this customer");
         }
@@ -140,13 +140,16 @@ public class CustomerServiceMPL extends ClientService implements CustomerService
      * @throws CustomerException - Will be thrown if there are problem with current user.
      */
     @Override
-    public Customer getCustomerDetails() throws CustomerException {
+    public Customer getCustomerDetails(String token) throws CustomerException {
+        thisCustomer = setId(token);
+        customerId = thisCustomer.getId();
+        thisCustomer = setId(token) ;
         if(thisCustomer == null){
             throw new CustomerException("customer does not exists");
         }
 
         try {
-            thisCustomer.setCoupons(new HashSet<>(getAllCustomerCoupon()));
+            thisCustomer.setCoupons(new HashSet<>(getAllCustomerCoupon(token)));
         } catch (CouponException e) {
             System.out.println(e.getMessage());
         }
@@ -161,7 +164,6 @@ public class CustomerServiceMPL extends ClientService implements CustomerService
     @Override
     public void logOut(){
         isLogged = false;
-        token = null;
     }
 
 
@@ -173,23 +175,7 @@ public class CustomerServiceMPL extends ClientService implements CustomerService
         return isLogged;
     }
 
-    /**
-     *
-     * @return - string with token if is logged
-     */
-    public String getToken() {
-        if(isLogged){
-            Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
-            List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority("ROLE_"+ Roles.CUSTOMER.name()));
-            User userDetails = new User(thisCustomer.getEmail(), thisCustomer.getPassword(),authorities);
-            token = JWT.create().withSubject(userDetails.getUsername())
-                    .withClaim("id",thisCustomer.getId())
-                    .withExpiresAt(new Date(System.currentTimeMillis() +30 *1000))
-                    .withClaim("authorities", userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList())).sign(algorithm);
-        }
-        return token;
-    }
+
 
     /**
      * get this company
@@ -198,4 +184,26 @@ public class CustomerServiceMPL extends ClientService implements CustomerService
     public Customer getThisCustomer() {
         return thisCustomer;
     }
+
+    public int CustomerId(String userName) throws LoginException {
+        Customer customer = CUSTOMER_REPO.findByEmailLike(userName);
+        if(customer!=null){
+            return customer.getId();
+        }
+        throw new LoginException();
+
+    }
+
+
+    public Customer setId(String token) {
+
+
+        DecodedJWT decodedJWT = JWT.decode(token.replace("Bearer ", ""));
+        int companyID = decodedJWT.getClaim("id").asInt();
+        Customer thisCustomer = CUSTOMER_REPO.findById(companyID).get();
+
+
+        return thisCustomer;
+    }
+
 }

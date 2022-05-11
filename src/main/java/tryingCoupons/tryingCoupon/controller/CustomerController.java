@@ -9,6 +9,7 @@ import tryingCoupons.tryingCoupon.beans.Customer;
 import tryingCoupons.tryingCoupon.exceptions.*;
 import tryingCoupons.tryingCoupon.services.CustomerServiceMPL;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -41,8 +42,10 @@ public class CustomerController {
      */
     @PutMapping("/purchasecoupon/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void purchaseCoupon(@PathVariable int id) throws CouponOutOfAmountException, CouponException, CouponExpiredException, CustomerCouponException {
-        customerServiceMPL.purchaseCoupons(id);
+    public void purchaseCoupon(@PathVariable int id, HttpServletRequest request) throws CouponOutOfAmountException, CouponException, CouponExpiredException, CustomerCouponException {
+        String token = request.getHeader("Authorization").replace("Bearer ","");
+
+        customerServiceMPL.purchaseCoupons(id,token);
     }
 
     /**
@@ -52,8 +55,10 @@ public class CustomerController {
      */
     @GetMapping("/AllCustomerCoupon")
     @ResponseStatus(HttpStatus.OK)
-    public List<Coupon> AllCustomerCoupons() throws CouponException {
-        return customerServiceMPL.getAllCustomerCoupon();
+    public List<Coupon> AllCustomerCoupons(HttpServletRequest request) throws CouponException {
+        String token = request.getHeader("Authorization").replace("Bearer ","");
+
+        return customerServiceMPL.getAllCustomerCoupon(token);
     }
     /**
      * Getting Company coupons By category
@@ -63,8 +68,9 @@ public class CustomerController {
      */
     @GetMapping("/couponsCategory/{categoryId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<Coupon> AllCustomerCouponsByCategory(@PathVariable int categoryId) throws CouponException {
-        return customerServiceMPL.getCustomerCouponByCategory(categoryId);
+    public List<Coupon> AllCustomerCouponsByCategory(@PathVariable int categoryId, HttpServletRequest request) throws CouponException {
+        String token = request.getHeader("Authorization").replace("Bearer ","");
+        return customerServiceMPL.getCustomerCouponByCategory(categoryId,token);
     }
 
 
@@ -76,8 +82,10 @@ public class CustomerController {
      */
     @GetMapping("/maxPrice/{maxPrice}")
     @ResponseStatus(HttpStatus.OK)
-    public List<Coupon> couponsByMaxPrice(@PathVariable int maxPrice) throws CouponException {
-        return customerServiceMPL.getCustomerCouponByMaxPriced(maxPrice);
+    public List<Coupon> couponsByMaxPrice(@PathVariable int maxPrice, HttpServletRequest request) throws CouponException {
+        String token = request.getHeader("Authorization").replace("Bearer ","");
+
+        return customerServiceMPL.getCustomerCouponByMaxPriced(maxPrice, token);
     }
 
     /**
@@ -87,8 +95,9 @@ public class CustomerController {
      */
     @GetMapping("/customerDetails")
     @ResponseStatus(HttpStatus.OK)
-    public Customer userDetails() throws CustomerException {
-        return customerServiceMPL.getCustomerDetails();
+    public Customer userDetails(HttpServletRequest request) throws CustomerException {
+        String token = request.getHeader("Authorization").replace("Bearer ","");
+        return customerServiceMPL.getCustomerDetails(token);
     }
 
 }

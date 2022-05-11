@@ -11,6 +11,7 @@ import org.springframework.test.context.event.annotation.BeforeTestExecution;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import tryingCoupons.tryingCoupon.beans.Coupon;
+import tryingCoupons.tryingCoupon.beans.Roles;
 import tryingCoupons.tryingCoupon.beans.UserProp;
 import tryingCoupons.tryingCoupon.repositories.CouponRepo;
 
@@ -30,29 +31,36 @@ public class CustomerTest {
 
 
     @LocalServerPort
-    @BeforeTestExecution
-    void customerLogin(){
-        String login = "http://localhost:8080/token/log";
-        UserProp userProp = UserProp.builder()
-                .username("just kill me already")
-                .password("justKillMeAlready")
-                .build();
-        restTemplate.postForEntity(login,userProp,String.class);
-
-//        Map<String,String> map = new HashMap<>();
-//        map.put("password","justKillMeAlready");
-//        map.put("username","just kill me already");
-//        ResponseEntity<String> response = restTemplate.postForEntity(login,String.class,null,map);
-//        Assertions.assertEquals(202,response.getStatusCodeValue());
-
-    }
+//    @BeforeTestExecution
+//    void customerLogin(){
+//        String login = "http://localhost:8080/token/log";
+//        UserProp userProp = UserProp.builder()
+//                .username("just kill me already")
+//                .password("justKillMeAlready")
+//                .build();
+//        restTemplate.postForEntity(login,userProp,String.class);
+//
+////        Map<String,String> map = new HashMap<>();
+////        map.put("password","justKillMeAlready");
+////        map.put("username","just kill me already");
+////        ResponseEntity<String> response = restTemplate.postForEntity(login,String.class,null,map);
+////        Assertions.assertEquals(202,response.getStatusCodeValue());
+//
+//    }
 
     @BeforeEach
     void customerGetToken(){
-        String getToken = "http://localhost:8080/token/getToken";
-        ResponseEntity<String> response1 = restTemplate.getForEntity(getToken,String.class);
-        jwtToken = response1.getHeaders().getFirst("Token");
-        Assertions.assertEquals(202,response1.getStatusCodeValue());
+        Map<String,String> params3 = new HashMap<>();
+        params3.put("roles", Roles.CUSTOMER.name());
+        String login3 = "http://localhost:8080/token/log/{roles}";
+        UserProp userProp3 = UserProp.builder()
+                .username("just kill me already")
+                .password("justKillMeAlready")
+                .role(Roles.CUSTOMER)
+                .build();
+        ResponseEntity<String> response3 = restTemplate.postForEntity(login3,userProp3,String.class,params3);
+        String customerToken = response3.getHeaders().getFirst("Authorization");
+        jwtToken = customerToken;
     }
 
     @Test
@@ -142,7 +150,9 @@ public class CustomerTest {
 
     @Test
     void customerLoginEx(){
-        String url = "http://localhost:8080/token/log";
+        Map<String,String> params3 = new HashMap<>();
+        params3.put("roles", Roles.CUSTOMER.name());
+        String login3 = "http://localhost:8080/token/log/{roles}";
         UserProp userProp = UserProp.builder()
                 .username("justkillmealraedy")
                 .password("killme")
@@ -150,14 +160,14 @@ public class CustomerTest {
 
 
         try {
-            restTemplate.postForEntity(url,userProp,Boolean.class);
+            restTemplate.postForEntity(login3,userProp,Boolean.class,params3);
         }catch (HttpClientErrorException.Unauthorized err){
             System.out.println(err.getMessage());
         }
 
 
         Assertions.assertThrows(HttpClientErrorException.Unauthorized.class,()-> {
-                    restTemplate.postForEntity(url,userProp,Boolean.class);
+                    restTemplate.postForEntity(login3,userProp,Boolean.class,params3);
                 }
         );
 

@@ -166,7 +166,23 @@ public class AdminServicesService extends ClientService implements AdminService 
      */
     @Override
     public void updateCustomer(Customer customer, String token) throws CustomerException {
-        if(CUSTOMER_REPO.existsById(customer.getId())){
+        Optional<Customer> customerToUpdate = CUSTOMER_REPO.findById(customer.getId());
+        if(customerToUpdate.isPresent()){
+            if(customer.getFirstName().equals("")){
+                customer.setFirstName(customerToUpdate.get().getFirstName());
+            }
+            if(customer.getLastName().equals("")){
+                customer.setLastName(customerToUpdate.get().getLastName());
+            }
+            if(customer.getEmail().equals("")){
+                customer.setEmail(customerToUpdate.get().getEmail());
+            }
+            if(customer.getPassword().equals("")){
+                customer.setPassword(customerToUpdate.get().getPassword());
+            }
+
+
+
             CUSTOMER_REPO.updateCustomer(customer.getEmail(), customer.getFirstName(), customer.getLastName(), customer.getPassword(), customer.getId());
             System.out.println("customer is successfully updated id: " + customer.getId());
         }

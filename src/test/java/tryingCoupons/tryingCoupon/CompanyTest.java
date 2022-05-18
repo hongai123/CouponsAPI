@@ -45,7 +45,7 @@ public class CompanyTest {
         params2.put("roles",Roles.COMPANY.name());
         String loginCompany = "http://localhost:8080/token/log/{roles}";
         UserProp userProp2 = UserProp.builder()
-                .username("justin bieber")
+                .username("justinbieber")
                 .password("DrewHouse")
                 .role(Roles.COMPANY)
                 .build();

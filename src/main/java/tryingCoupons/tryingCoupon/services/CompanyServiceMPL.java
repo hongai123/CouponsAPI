@@ -76,7 +76,9 @@ public class CompanyServiceMPL extends ClientService implements CompanyService{
         if(companyID == -1){
             throw new CompanyException("company is not logged!");
         }
+
         coupon.setCompany_id_sql(thisCompany);
+        coupon.setCompany_string(thisCompany.getName());
         if(coupon.getEnd_date().before(Date.valueOf(LocalDate.now()))||coupon.getEnd_date().equals(Date.valueOf(LocalDate.now()))){
             throw new CouponExpiredException();
         }
@@ -89,10 +91,12 @@ public class CompanyServiceMPL extends ClientService implements CompanyService{
         Optional<CategoryInjection> categoryInjection = categoryRepo.findById(coupon.getCategory_id_bynum());
         if(categoryInjection.isPresent()){
             coupon.setCategory(categoryInjection.get());
+            coupon.setCategoryString(Category.getCategory(categoryInjection.get().getId()));
         }else{
             throw new CouponException("coupon category does not exists!");
         }
         coupon.setCompanyId(companyID);
+        coupon.setCategoryString(coupon.getCategory().getCategory());
         COUPON_REPO.save(coupon);
         //coupon.setCouponID(COUPON_REPO.companyCoupon(coupon.getTitle(), companyID).getCoupon_id());
         System.out.println("Successfully added coupon");
@@ -118,6 +122,8 @@ public class CompanyServiceMPL extends ClientService implements CompanyService{
             System.out.println(couponToCheck.getCompanyId());
             System.out.println(coupon.getCompanyId());
             if(couponToCheck.getCompanyId() == (coupon.getCompanyId())){
+                coupon.setCompany_string(thisCompany.getName());
+                coupon.setCategoryString(Category.getCategory(coupon.getCategory_id_bynum()));
                 COUPON_REPO.saveAndFlush(coupon);
                 System.out.println("successfully updated");
             }

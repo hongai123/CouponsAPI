@@ -43,9 +43,7 @@ public class Coupon {
     @ManyToOne
     @JoinColumn( referencedColumnName = "id")
     private Company company_id_sql;
-
     @Enumerated(value = EnumType.ORDINAL)
-
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id")
@@ -68,6 +66,12 @@ public class Coupon {
     private int category_id_bynum;
     @Column(name = "company_id")
     private int companyId;
+    @Column(name = "category_string",nullable = false,length = 40)
+    @Enumerated(value = EnumType.STRING)
+    private Category categoryString;
+    @Column(name = "company_string" , nullable = false , length = 40)
+    private String company_string;
+
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER,cascade = {CascadeType.PERSIST, CascadeType.MERGE,CascadeType.DETACH,CascadeType.REFRESH})
@@ -94,7 +98,25 @@ public class Coupon {
                 ", amount=" + getAmount() +
                 ", price=" + getPrice() +
                 ", image='" + getImage() +
+                ", category_string="+ getCategoryString() +
+                ", company_string="+getCompany_string() +
                 '}';
+    }
+
+    public String getCompany_string() {
+        return company_string;
+    }
+
+    public void setCompany_string(String company_string) {
+        this.company_string = company_string;
+    }
+
+    public Category getCategoryString() {
+        return categoryString;
+    }
+
+    public void setCategoryString(Category categoryString) {
+        this.categoryString = categoryString;
     }
 
     @Override

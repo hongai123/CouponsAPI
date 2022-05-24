@@ -19,7 +19,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 
-@Component
+//@Component
 @RequiredArgsConstructor
 /**
  * A component that uploads some mock data
@@ -129,6 +129,7 @@ public class UploadSomeData implements CommandLineRunner {
         companyServiceMPL.addCoupon(coupon1,jwtTokenCompany);
         companyServiceMPL.addCoupon(coupon2,jwtTokenCompany);
         companyServiceMPL.addCoupon(coupon3,jwtTokenCompany);
+
         Set<Coupon> customerCoupons = new HashSet<>();
         customerCoupons.add(couponRepo.findById(1).get());
         customerCoupons.add(couponRepo.findById(2).get());
@@ -211,7 +212,7 @@ public class UploadSomeData implements CommandLineRunner {
             System.out.println(err.getMessage());
         }
 
-        customer3.setEmail("just kill me already");
+        customer3.setEmail("customer3@gmail.com");
 
 
         try{
@@ -311,6 +312,10 @@ public class UploadSomeData implements CommandLineRunner {
         companyServiceMPL.logOut();
         adminServicesMPL.logOut();
         customerServiceMPL.logOut();
+
+
+
+
 
 //        companyServiceMPL.login("justin bieber","DrewHouse");
 //        companyServiceMPL.setId(companyServiceMPL.getToken());

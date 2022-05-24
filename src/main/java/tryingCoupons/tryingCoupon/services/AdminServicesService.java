@@ -63,6 +63,7 @@ public class AdminServicesService extends ClientService implements AdminService 
     public void addCompany(Company company, String token) throws CompanyException {
         if(COMPANY_REPO.isCompanyExistsByName(company.getName()) || COMPANY_REPO.isCompanyExistsByEmail(company.getEmail())){
             throw new CompanyException();
+
         }
         else{
             COMPANY_REPO.save(company);
@@ -137,6 +138,7 @@ public class AdminServicesService extends ClientService implements AdminService 
             throw new CompanyException("company does not exists");
         }
         company.setPassword("{secret}");
+
         return company;
     }
 

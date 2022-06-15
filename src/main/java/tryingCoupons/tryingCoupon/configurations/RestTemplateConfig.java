@@ -1,8 +1,12 @@
 package tryingCoupons.tryingCoupon.configurations;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.BootstrapRegistry;
+import org.springframework.boot.jackson.JsonComponent;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.web.client.RestTemplate;
 import java.time.Duration;
 

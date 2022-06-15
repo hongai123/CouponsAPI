@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import tryingCoupons.tryingCoupon.beans.Company;
 import tryingCoupons.tryingCoupon.beans.Customer;
 import tryingCoupons.tryingCoupon.beans.Roles;
-import tryingCoupons.tryingCoupon.exceptions.LoginException;
 import tryingCoupons.tryingCoupon.repositories.CompanyRepo;
 import tryingCoupons.tryingCoupon.repositories.CustomerRepo;
 import javax.transaction.Transactional;

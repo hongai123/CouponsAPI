@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tryingCoupons.tryingCoupon.beans.Coupon;
+import tryingCoupons.tryingCoupon.repositories.CouponRepo;
 import tryingCoupons.tryingCoupon.services.AdminService;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class GuestController {
 
     private final AdminService adminService;
+    private final CouponRepo couponRepo;
 
     /**
      * Getting - All coupons that are available.
@@ -26,6 +28,6 @@ public class GuestController {
     @GetMapping("/allAvailableCoupons")
     @ResponseStatus(HttpStatus.OK)
     public List<Coupon> getAllCoupons(){
-        return adminService.findAllAvailableCoupons();
+        return couponRepo.findAll();
     }
 }

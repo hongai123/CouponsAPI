@@ -15,9 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 import tryingCoupons.tryingCoupon.beans.Roles;
 import tryingCoupons.tryingCoupon.beans.UserProp;
 import tryingCoupons.tryingCoupon.exceptions.LoginException;
-import tryingCoupons.tryingCoupon.services.AdminServicesService;
-import tryingCoupons.tryingCoupon.services.CompanyServiceMPL;
-import tryingCoupons.tryingCoupon.services.CustomerServiceMPL;
+import tryingCoupons.tryingCoupon.services.*;
 
 import javax.persistence.Enumerated;
 import java.sql.Date;
@@ -36,6 +34,7 @@ public class GetTokenController {
     private final CompanyServiceMPL companyServiceMPL;
     private final CustomerServiceMPL customerServiceMPL;
     private final AdminServicesService adminServicesMPL;
+    private final LogsManagerServiceMPL logsManagerServiceMPL;
 
 //    /**
 //     * Getting token of logged user from header.
@@ -79,30 +78,29 @@ public class GetTokenController {
 
     /**
      * Logout
+     *
      * @return - ModelAndView Object which redirect browser to a specific route.
      * @throws LoginException - If the user is not logged this exception will be thrown.
      */
     @RequestMapping(value = "/lognout", method = RequestMethod.GET)
     public ModelAndView logOut() throws LoginException {
-        if(adminServicesMPL.isLogged()){
+        if (adminServicesMPL.isLogged()) {
             adminServicesMPL.logOut();
             System.out.println("in admin logout");
             return new ModelAndView("redirect:" + "http://localhost:8080/login");
         }
 
-        if(companyServiceMPL.isLogged()){
+        if (companyServiceMPL.isLogged()) {
             companyServiceMPL.logOut();
             System.out.println("in company log out");
             return new ModelAndView("redirect:" + "http://localhost:8080/login");
         }
 
-        if(customerServiceMPL.isLogged()){
+        if (customerServiceMPL.isLogged()) {
             customerServiceMPL.logOut();
             System.out.println("in customer log out");
             return new ModelAndView("redirect:" + "http://localhost:8080/login");
-        }
-
-        else{
+        } else {
             throw new LoginException("Please log in first!");
 
         }
@@ -110,6 +108,7 @@ public class GetTokenController {
 
     /**
      * Login with controller
+     *
      * @param user - User object which contains username and password.
      * @return - boolean if logged.
      * @throws LoginException - Will be thrown if username or password are invalid.
@@ -117,73 +116,9 @@ public class GetTokenController {
     @RequestMapping(value = "/log/{roles}", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<String> log(@RequestBody UserProp user, @PathVariable Roles roles) throws LoginException {
-        System.out.println(user);
-        user.setRole(roles);
-        HttpHeaders responseHeader =  new HttpHeaders();
-
-        if(user.getRole().name().equals("ADMIN")) {
-            if (adminServicesMPL.login(user.getUsername(), user.getPassword())) {
-                Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
-                List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-                authorities.add(new SimpleGrantedAuthority("ROLE_" + Roles.ADMIN.name()));
-                User userDetails = new User("admin@admin.com", "admin", authorities);
-
-                String token = JWT.create().withSubject(userDetails.getUsername())
-                        .withClaim("id", 1)
-                        .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 10000))
-                        .withClaim("authorities", userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList())).sign(algorithm);
-                responseHeader.set("Authorization", "Bearer " + token);
-                //return "Bearer " + adminServicesMPL.getToken();
-                return ResponseEntity.accepted()
-                        .headers(responseHeader)
-                        .body("your token is in the headers!");
-
-            }else{
-                throw new LoginException("wrong username or password");
-            }
-
-        }
-
-        if(user.getRole().name().equals("COMPANY")) {
-            if (companyServiceMPL.login(user.getUsername(), user.getPassword())) {
-                Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
-                List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-                authorities.add(new SimpleGrantedAuthority("ROLE_" + Roles.COMPANY.name()));
-                User userDetails = new User(user.getUsername(), user.getPassword(), authorities);
-                String token = JWT.create().withSubject(userDetails.getUsername())
-                        .withClaim("id", companyServiceMPL.CompanyId(user.getUsername(), user.getPassword()))
-                        .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 10000))
-                        .withClaim("authorities", userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList())).sign(algorithm);
-                responseHeader.set("Authorization", "Bearer " + token);
-                return ResponseEntity.accepted()
-                        .headers(responseHeader)
-                        .body("your token is in the headers!");
-
-            }else {
-                throw new LoginException("wrong username or password");
-            }
-        }
-
-        if(user.getRole().name().equals("CUSTOMER"))
-            if(customerServiceMPL.login(user.getUsername(), user.getPassword())){
-                Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
-                List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-                authorities.add(new SimpleGrantedAuthority("ROLE_" + Roles.CUSTOMER.name()));
-                User userDetails = new User(user.getUsername(), user.getPassword(), authorities);
-                String token = JWT.create().withSubject(userDetails.getUsername())
-                        .withClaim("id", customerServiceMPL.CustomerId(user.getUsername()))
-                        .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 10000))
-                        .withClaim("authorities", userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList())).sign(algorithm);
-                responseHeader.set("Authorization", "Bearer " + token);
-                return ResponseEntity.accepted()
-                        .headers(responseHeader)
-                        .body("your token is in the headers!");
-        }
-
-
-            throw new LoginException("wrong username or password");
-
+        return logsManagerServiceMPL.userLog(user, roles);
 
     }
+
 
 }

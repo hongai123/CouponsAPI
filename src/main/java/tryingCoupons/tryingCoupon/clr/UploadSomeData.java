@@ -3,7 +3,6 @@ package tryingCoupons.tryingCoupon.clr;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import tryingCoupons.tryingCoupon.beans.*;
 import tryingCoupons.tryingCoupon.exceptions.*;

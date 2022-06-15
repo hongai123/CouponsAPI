@@ -1,7 +1,12 @@
 package tryingCoupons.tryingCoupon.clr;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import tryingCoupons.tryingCoupon.beans.Customer;
+import tryingCoupons.tryingCoupon.services.AdminService;
+import tryingCoupons.tryingCoupon.services.AdminServicesService;
+
+import java.util.*;
 
 public class RestTest {
 //        double decimalUse = 10;
@@ -72,9 +77,26 @@ public class RestTest {
 //                }
 //            }).start();
 
+    public void hello(){
+        System.out.println("hello");
+    }
+
 
     public static void main(String[] args) {
-        System.out.println("hello");
+           byte x = 64;
+           int i;
+           byte y;
+           i= x << 4;
+        System.out.println(i);
+        Stack<String> stack=  new Stack<String>();
+        Set<String> set = new HashSet<String>();
+        Map<String,String> lol = new HashMap<>();
+        set.add("lol");
+        set.add("lol");
+        set.add("check on me");
+        System.out.println(set);
+
+
     }
 
     }
